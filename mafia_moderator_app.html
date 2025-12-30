@@ -4,8 +4,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mafia Moderator</title>
+    <title>Mafia Moderator Pro</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Outfit:wght@300;400;600&display=swap"
+        rel="stylesheet">
     <style>
+        :root {
+            --bg-dark: #121212;
+            --surface: rgba(30, 30, 36, 0.7);
+            --surface-hover: rgba(40, 40, 48, 0.9);
+            --primary: #e94560;
+            --primary-hover: #ff6b6b;
+            --accent: #ffd700;
+            --text-main: #e0e0e0;
+            --text-muted: #a0a0a0;
+            --success: #51cf66;
+            --border: rgba(255, 255, 255, 0.1);
+            --glass: blur(10px);
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -13,163 +32,253 @@
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            background: #1a1a1a;
-            color: #e0e0e0;
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--bg-dark);
+            background-image:
+                radial-gradient(circle at 10% 20%, rgba(233, 69, 96, 0.15) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(255, 215, 0, 0.1) 0%, transparent 40%);
+            background-attachment: fixed;
+            color: var(--text-main);
             padding: 20px;
-            line-height: 1.6;
+            min-height: 100vh;
         }
 
         .container {
-            max-width: 1200px;
+            max-width: 1000px;
             margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        h1,
+        h2,
+        h3 {
+            font-family: 'Cinzel', serif;
+            letter-spacing: 1px;
         }
 
         h1 {
             text-align: center;
-            margin-bottom: 30px;
-            color: #ff6b6b;
+            margin-bottom: 40px;
+            font-size: 3rem;
+            background: linear-gradient(45deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 4px 15px rgba(233, 69, 96, 0.3);
+            animation: fadeIn 1s ease-out;
         }
 
         h2 {
-            margin: 20px 0 10px;
-            color: #4ecdc4;
-            border-bottom: 2px solid #4ecdc4;
-            padding-bottom: 5px;
+            margin-bottom: 20px;
+            color: var(--accent);
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 10px;
+            font-size: 1.8rem;
         }
 
         .section {
-            background: #2a2a2a;
-            padding: 20px;
-            margin-bottom: 20px;
-            border-radius: 8px;
+            background: var(--surface);
+            padding: 30px;
+            margin-bottom: 25px;
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            backdrop-filter: var(--glass);
+            -webkit-backdrop-filter: var(--glass);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+            animation: slideUp 0.5s ease-out;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .section:hover {
+            box-shadow: 0 10px 40px 0 rgba(0, 0, 0, 0.5);
         }
 
         .form-group {
-            margin-bottom: 15px;
+            margin-bottom: 20px;
         }
 
         label {
             display: block;
-            margin-bottom: 5px;
-            color: #b0b0b0;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
         input,
-        select,
-        textarea {
+        select {
             width: 100%;
-            padding: 10px;
-            background: #1a1a1a;
-            border: 1px solid #444;
-            border-radius: 4px;
-            color: #e0e0e0;
-            font-size: 14px;
+            padding: 12px 15px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text-main);
+            font-family: 'Outfit', sans-serif;
+            font-size: 1rem;
+            transition: all 0.3s ease;
         }
 
-        textarea {
-            resize: vertical;
-            min-height: 60px;
+        select {
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23e94560' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 10px center;
+            background-size: 16px;
+            cursor: pointer;
+        }
+
+        input:focus,
+        select:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: rgba(0, 0, 0, 0.5);
+            box-shadow: 0 0 0 2px rgba(233, 69, 96, 0.2);
+        }
+
+        /* Fix for native dropdown options on Windows to match theme */
+        select option {
+            background-color: #1e1e24;
+            /* Hardcoded dark color often works better than var in quirks input */
+            color: var(--text-main);
+            padding: 10px;
         }
 
         button {
-            padding: 10px 20px;
-            background: #4ecdc4;
-            color: #1a1a1a;
+            padding: 12px 24px;
+            background: linear-gradient(135deg, var(--primary) 0%, #c0394d 100%);
+            color: white;
             border: none;
-            border-radius: 4px;
+            border-radius: 8px;
             cursor: pointer;
-            font-weight: bold;
+            font-weight: 600;
+            font-family: 'Outfit', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             margin-right: 10px;
             margin-bottom: 10px;
+            box-shadow: 0 4px 15px rgba(233, 69, 96, 0.4);
         }
 
         button:hover {
-            background: #45b8b0;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(233, 69, 96, 0.6);
+            filter: brightness(1.1);
         }
 
-        button.danger {
-            background: #ff6b6b;
-        }
-
-        button.danger:hover {
-            background: #ff5252;
+        button:active {
+            transform: translateY(-1px);
         }
 
         button.secondary {
-            background: #555;
+            background: linear-gradient(135deg, #444 0%, #2a2a2a 100%);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
         }
 
         button.secondary:hover {
-            background: #666;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
+        }
+
+        button.danger {
+            background: linear-gradient(135deg, #8a2a2a 0%, #5a1a1a 100%);
+            box-shadow: 0 4px 15px rgba(138, 42, 42, 0.4);
+            border: 1px solid rgba(255, 99, 71, 0.3);
         }
 
         table {
             width: 100%;
-            border-collapse: collapse;
-            margin-top: 10px;
+            border-collapse: separate;
+            border-spacing: 0;
+            margin-top: 15px;
+            border-radius: 12px;
+            overflow: hidden;
+            background: rgba(0, 0, 0, 0.2);
         }
 
         th,
         td {
-            padding: 10px;
+            padding: 15px;
             text-align: left;
-            border-bottom: 1px solid #444;
+            border-bottom: 1px solid var(--border);
         }
 
         th {
-            background: #333;
-            color: #4ecdc4;
-            font-weight: bold;
+            background: rgba(233, 69, 96, 0.1);
+            color: var(--primary);
+            font-family: 'Cinzel', serif;
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 0.85rem;
         }
 
-        tr:hover {
-            background: #333;
+        tr:hover td {
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        tr:last-child td {
+            border-bottom: none;
         }
 
         .status-alive {
-            color: #51cf66;
+            color: var(--success);
             font-weight: bold;
+            text-shadow: 0 0 10px rgba(81, 207, 102, 0.3);
         }
 
         .status-dead {
             color: #ff6b6b;
             text-decoration: line-through;
+            opacity: 0.7;
         }
 
         .role-mafia {
-            color: #ff6b6b;
+            color: #ff4757;
+            font-weight: bold;
         }
 
         .role-doctor {
-            color: #51cf66;
+            color: #2ed573;
+            font-weight: bold;
         }
 
         .role-detective {
-            color: #4ecdc4;
+            color: #1e90ff;
+            font-weight: bold;
         }
 
         .role-villager {
-            color: #ffd93d;
+            color: #eccc68;
         }
 
         .round-indicator {
             text-align: center;
-            font-size: 24px;
-            font-weight: bold;
-            color: #4ecdc4;
-            margin: 20px 0;
-            padding: 15px;
-            background: #333;
-            border-radius: 8px;
+            font-size: 2rem;
+            font-family: 'Cinzel', serif;
+            color: var(--accent);
+            margin: 30px 0;
+            padding: 20px;
+            background: linear-gradient(90deg, transparent, rgba(255, 215, 0, 0.1), transparent);
+            border-top: 1px solid rgba(255, 215, 0, 0.2);
+            border-bottom: 1px solid rgba(255, 215, 0, 0.2);
+            animation: pulse 2s infinite;
         }
 
         .history-item {
-            background: #333;
+            background: rgba(0, 0, 0, 0.3);
             padding: 15px;
-            margin-bottom: 10px;
-            border-radius: 4px;
-            border-left: 4px solid #4ecdc4;
+            margin-bottom: 12px;
+            border-radius: 8px;
+            border-left: 4px solid var(--primary);
+            transition: transform 0.2s ease;
+        }
+
+        .history-item:hover {
+            transform: translateX(5px);
+            background: rgba(0, 0, 0, 0.4);
         }
 
         .history-night {
@@ -177,26 +286,125 @@
         }
 
         .history-day {
-            border-left-color: #ffd93d;
+            border-left-color: var(--accent);
         }
 
         .vote-row {
             display: flex;
-            gap: 10px;
-            margin-bottom: 10px;
+            gap: 15px;
+            margin-bottom: 15px;
             align-items: center;
+            background: rgba(255, 255, 255, 0.03);
+            padding: 10px;
+            border-radius: 8px;
         }
 
         .vote-row select {
             flex: 1;
-        }
-
-        .vote-row button {
-            margin: 0;
+            background: transparent;
+            border: none;
+            border-bottom: 1px solid var(--border);
+            border-radius: 0;
         }
 
         .hidden {
-            display: none;
+            display: none !important;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes pulse {
+            0% {
+                text-shadow: 0 0 10px rgba(255, 215, 0, 0.2);
+                transform: scale(1);
+            }
+
+            50% {
+                text-shadow: 0 0 20px rgba(255, 215, 0, 0.6);
+                transform: scale(1.05);
+            }
+
+            100% {
+                text-shadow: 0 0 10px rgba(255, 215, 0, 0.2);
+                transform: scale(1);
+            }
+        }
+
+        @keyframes modalScale {
+            from {
+                transform: scale(0.9);
+                opacity: 0;
+            }
+
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(5px);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal-content {
+            background: rgba(30, 30, 36, 0.95);
+            padding: 30px;
+            border-radius: 16px;
+            border: 1px solid var(--primary);
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.8);
+            animation: modalScale 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .modal-content h3 {
+            margin-bottom: 15px;
+            color: var(--primary);
+        }
+
+        .modal-content p {
+            margin-bottom: 25px;
+            color: var(--text-main);
+        }
+
+        .modal-actions {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
         }
 
         @media (max-width: 768px) {
@@ -205,21 +413,20 @@
             }
 
             .section {
-                padding: 15px;
+                padding: 20px;
             }
 
-            table {
-                font-size: 12px;
-            }
-
-            th,
-            td {
-                padding: 6px;
+            h1 {
+                font-size: 2rem;
             }
 
             button {
-                padding: 8px 15px;
-                font-size: 13px;
+                width: 100%;
+                margin-right: 0;
+            }
+
+            .vote-row {
+                flex-direction: column;
             }
         }
     </style>
@@ -323,6 +530,18 @@
         </div>
     </div>
 
+    <!-- Custom Modal -->
+    <div id="confirmModal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <h3 id="modalTitle">Confirmation</h3>
+            <p id="modalMessage">Are you sure?</p>
+            <div class="modal-actions">
+                <button id="modalBtnYes">Yes</button>
+                <button id="modalBtnNo" class="secondary">No</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         let gameState = {
             players: [],
@@ -338,6 +557,71 @@
             'Kishan', 'Foram', 'Shivam', 'Sumant', 'Navdeep',
             'Yatri', 'Jinali', 'Sunil'
         ];
+
+        function showConfirm(message, title = 'Confirmation') {
+            return new Promise((resolve) => {
+                const modal = document.getElementById('confirmModal');
+                const titleEl = document.getElementById('modalTitle');
+                const msgEl = document.getElementById('modalMessage');
+                const btnYes = document.getElementById('modalBtnYes');
+                const btnNo = document.getElementById('modalBtnNo');
+
+                // Reset state for confirm
+                titleEl.textContent = title;
+                msgEl.textContent = message;
+                btnYes.textContent = 'Yes';
+                btnNo.classList.remove('hidden');
+                modal.classList.remove('hidden');
+
+                const handleYes = () => {
+                    cleanup();
+                    resolve(true);
+                };
+
+                const handleNo = () => {
+                    cleanup();
+                    resolve(false);
+                };
+
+                const cleanup = () => {
+                    btnYes.removeEventListener('click', handleYes);
+                    btnNo.removeEventListener('click', handleNo);
+                    modal.classList.add('hidden');
+                };
+
+                btnYes.addEventListener('click', handleYes);
+                btnNo.addEventListener('click', handleNo);
+            });
+        }
+
+        function showAlert(message, title = 'Alert') {
+            return new Promise((resolve) => {
+                const modal = document.getElementById('confirmModal');
+                const titleEl = document.getElementById('modalTitle');
+                const msgEl = document.getElementById('modalMessage');
+                const btnYes = document.getElementById('modalBtnYes');
+                const btnNo = document.getElementById('modalBtnNo');
+
+                // Custom state for alert
+                titleEl.textContent = title;
+                msgEl.innerHTML = message.replace(/\n/g, '<br>'); // Support newlines
+                btnYes.textContent = 'OK';
+                btnNo.classList.add('hidden'); // Hide No button
+                modal.classList.remove('hidden');
+
+                const handleOk = () => {
+                    cleanup();
+                    resolve();
+                };
+
+                const cleanup = () => {
+                    btnYes.removeEventListener('click', handleOk);
+                    modal.classList.add('hidden');
+                };
+
+                btnYes.addEventListener('click', handleOk);
+            });
+        }
 
         function loadGame() {
             const saved = localStorage.getItem('mafiaGame');
@@ -445,48 +729,53 @@
             document.getElementById('numPlayers').value = currentNum;
         }
 
-        function randomizeRoles() {
-            const playerRows = document.querySelectorAll('.player-row');
-            if (playerRows.length === 0) {
-                alert('Generate players first!');
+        async function randomizeRoles() {
+            const numPlayers = document.querySelectorAll('.player-row').length;
+            if (numPlayers < 3) {
+                await showAlert('Need at least 3 players to randomize.', 'Error');
                 return;
             }
 
-            const numPlayers = playerRows.length;
+            const roles = [];
+            // Basic logic: 
+            // 1 Detective, 1 Doctor (if > 3 players)
+            // Mafia approx 1/3 or 1/4? Let's say: 3-5 players = 1 Mafia. 6-8 = 2 Mafia. 9+ = 3 Mafia.
 
-            // Basic role distribution rules
-            let numMafia = Math.max(1, Math.floor(numPlayers / 3)); // ~1/3 are Mafia
-            if (numPlayers <= 5) numMafia = 1; // Small game adjustment
+            let numMafia = 1;
+            if (numPlayers >= 6) numMafia = 2;
+            if (numPlayers >= 9) numMafia = 3;
 
-            const numDoctor = 1;
-            const numDetective = 1;
-            const numVillagers = numPlayers - numMafia - numDoctor - numDetective;
+            let numDoctor = 1;
+            let numDetective = 1;
 
-            let roles = [];
+            if (numPlayers === 3) { numDoctor = 0; numDetective = 0; } // Very small game
+
+            let numVillagers = numPlayers - numMafia - numDoctor - numDetective;
+
+            // Fill array
             for (let i = 0; i < numMafia; i++) roles.push('Mafia');
             for (let i = 0; i < numDoctor; i++) roles.push('Doctor');
             for (let i = 0; i < numDetective; i++) roles.push('Detective');
             for (let i = 0; i < numVillagers; i++) roles.push('Villager');
 
-            // Shuffle roles
+            // Shuffle
             for (let i = roles.length - 1; i > 0; i--) {
                 const j = Math.floor(Math.random() * (i + 1));
                 [roles[i], roles[j]] = [roles[j], roles[i]];
             }
 
-            // Assign to UI
+            // Assign
+            const playerRows = document.querySelectorAll('.player-row');
             playerRows.forEach((row, index) => {
-                const roleSelect = row.querySelector('.player-role');
-                if (roles[index]) {
-                    roleSelect.value = roles[index];
-                }
+                const select = row.querySelector('.player-role');
+                select.value = roles[index];
             });
 
-            alert(`Roles Randomized!\nMafia: ${numMafia}\nDoctor: ${numDoctor}\nDetective: ${numDetective}\nVillagers: ${numVillagers}`);
+            await showAlert(`Roles Randomized!\nMafia: ${numMafia}\nDoctor: ${numDoctor}\nDetective: ${numDetective}\nVillagers: ${numVillagers}`, 'Roles Assigned');
         }
 
-        function startGame() {
-            if (!confirm('Start the game with these players?')) return;
+        async function startGame() {
+            if (!await showConfirm('Start the game with these players?', 'Start Game')) return;
 
             const playerRows = document.querySelectorAll('.player-row');
             gameState.players = [];
@@ -506,7 +795,7 @@
             });
 
             if (gameState.players.length === 0) {
-                alert('Please add at least one player!');
+                await showAlert('Please add at least one player!', 'Error');
                 return;
             }
 
@@ -613,9 +902,9 @@
             updateGameDisplay();
         }
 
-        function killPlayer(idx) {
+        async function killPlayer(idx) {
             const p = gameState.players[idx];
-            if (!confirm(`Kill ${p.name}?`)) return;
+            if (!await showConfirm(`Kill ${p.name}?`, 'Confirm Kill')) return;
 
             const reason = prompt('Death reason:', 'Killed by Mafia');
             p.alive = false;
@@ -625,11 +914,11 @@
 
             saveGame();
             updateGameDisplay();
-            checkWinCondition();
+            await checkWinCondition();
         }
 
-        function nextRound() {
-            if (!confirm('Move to next round?')) return;
+        async function nextRound() {
+            if (!await showConfirm('Move to next round?', 'Phase Change')) return;
 
             if (gameState.roundType === 'night') {
                 gameState.roundType = 'day';
@@ -650,8 +939,8 @@
             }
         }
 
-        function processNight() {
-            if (!confirm('Process night actions?')) return;
+        async function processNight() {
+            if (!await showConfirm('Process night actions?', 'Process Night')) return;
 
             const mafiaTarget = parseInt(document.getElementById('mafiaTarget').value);
             const doctorSave = parseInt(document.getElementById('doctorSave').value);
@@ -700,8 +989,8 @@
 
             saveGame();
             updateGameDisplay();
-            alert(outcome);
-            checkWinCondition();
+            await showAlert(outcome, 'Night Outcome');
+            await checkWinCondition();
             nextRound(); // Auto-trigger next round with confirmation
         }
 
@@ -857,10 +1146,10 @@
             document.getElementById('voteResults').classList.remove('hidden');
         }
 
-        function processDay() {
+        async function processDay() {
             const eliminated = parseInt(document.getElementById('eliminatedPlayer').value);
             if (!eliminated) {
-                if (confirm('No player selected. Skip elimination for this day?')) {
+                if (await showConfirm('No player selected. Skip elimination for this day?', 'Skip Elimination')) {
                     gameState.history.push({
                         round: gameState.currentRound,
                         type: 'day',
@@ -874,13 +1163,13 @@
                     saveGame();
                     updateGameDisplay();
                     document.getElementById('voteResults').classList.add('hidden');
-                    alert('No one was eliminated today.');
+                    await showAlert('No one was eliminated today.', 'Day Skipped');
                     nextRound(); // Auto-trigger next round
                 }
                 return;
             }
 
-            if (!confirm(`Eliminate ${getPlayerName(eliminated)}?`)) return;
+            if (!await showConfirm(`Eliminate ${getPlayerName(eliminated)}?`, 'Confirm Elimination')) return;
 
             const player = gameState.players.find(p => p.number === eliminated);
             player.alive = false;
@@ -897,9 +1186,10 @@
             gameState.votes = [];
             saveGame();
             updateGameDisplay();
+
             document.getElementById('voteResults').classList.add('hidden');
-            alert(`${player.name} (${player.role}) was eliminated.`);
-            checkWinCondition();
+            await showAlert(`${player.name} (${player.role}) was eliminated.`, 'Elimination Result');
+            await checkWinCondition();
             nextRound(); // Auto-trigger next round
         }
 
@@ -949,23 +1239,26 @@
             }
         }
 
-        function resetGame() {
-            if (!confirm('Reset entire game? This cannot be undone!')) return;
-            if (!confirm('Are you absolutely sure?')) return;
+        async function resetGame() {
+            if (!await showConfirm('Reset entire game? This cannot be undone!', 'Reset Game')) return;
+            // Second confirmation just to be safe, can use logic inside if needed or just one sturdy one. 
+            // We'll stick to one distinct modal for now or chain them.
+            // Let's chain it for extra safety.
+            if (!await showConfirm('Are you absolutely sure?', 'Double Check')) return;
 
             localStorage.removeItem('mafiaGame');
             location.reload();
         }
 
-        function checkWinCondition() {
-            const alivePlayers = gameState.players.filter(p => p.alive);
-            const mafiaCount = alivePlayers.filter(p => p.role === 'Mafia').length;
-            const villagerCount = alivePlayers.length - mafiaCount;
+        async function checkWinCondition() {
+            const aliveMafia = gameState.players.filter(p => p.alive && p.role === 'Mafia').length;
+            const aliveVillagers = gameState.players.filter(p => p.alive && p.role !== 'Mafia').length;
 
-            if (mafiaCount === 0) {
-                alert('🏆 VILLAGERS WIN!\n\nAll Mafia have been eliminated.');
-            } else if (mafiaCount >= villagerCount) {
-                alert('🕵️‍♂️ MAFIA WINS!\n\nMafia now equal or outnumber the Villagers.');
+            if (aliveMafia === 0) {
+                await showAlert('🏆 VILLAGERS WIN!\nAll Mafia members are eliminated.', 'Game Over');
+                // Optional: resetGame();
+            } else if (aliveMafia >= aliveVillagers) {
+                await showAlert('🕵️‍♂️ MAFIA WINS!\nMafia outnumber or equal the villagers.', 'Game Over');
             }
         }
 
