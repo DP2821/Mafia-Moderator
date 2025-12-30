@@ -334,6 +334,25 @@
             }
         }
 
+        /* Role Highlighting in Setup */
+        .select-mafia {
+            border-color: #ff4757 !important;
+            box-shadow: 0 0 10px rgba(255, 71, 87, 0.3) !important;
+            color: #ff4757 !important;
+        }
+
+        .select-doctor {
+            border-color: #2ed573 !important;
+            box-shadow: 0 0 10px rgba(46, 213, 115, 0.3) !important;
+            color: #2ed573 !important;
+        }
+
+        .select-detective {
+            border-color: #1e90ff !important;
+            box-shadow: 0 0 10px rgba(30, 144, 255, 0.3) !important;
+            color: #1e90ff !important;
+        }
+
         @keyframes pulse {
             0% {
                 text-shadow: 0 0 10px rgba(255, 215, 0, 0.2);
@@ -673,7 +692,7 @@
                 div.innerHTML = `
                     <input type="text" value="${i}" disabled style="width: 50px;">
                     <input type="text" class="player-name" placeholder="Player ${i}" value="Player ${i}">
-                    <select class="player-role">
+                    <select class="player-role" onchange="updateRoleColor(this)">
                         <option value="Villager">Villager</option>
                         <option value="Mafia">Mafia</option>
                         <option value="Doctor">Doctor</option>
@@ -682,13 +701,22 @@
                     <button onclick="removePlayerRow(this)" class="danger" style="padding: 5px 10px; margin: 0;">Remove</button>
                 `;
                 list.appendChild(div);
+                // Trigger update for default value (Villager)
+                updateRoleColor(div.querySelector('.player-role'));
             }
 
             document.getElementById('playerSetup').classList.remove('hidden');
         }
 
-        function removePlayerRow(button) {
-            const row = button.parentElement;
+        function updateRoleColor(select) {
+            select.classList.remove('select-mafia', 'select-doctor', 'select-detective');
+            if (select.value === 'Mafia') select.classList.add('select-mafia');
+            else if (select.value === 'Doctor') select.classList.add('select-doctor');
+            else if (select.value === 'Detective') select.classList.add('select-detective');
+        }
+
+        function removePlayerRow(btn) {
+            const row = btn.parentElement;
             row.remove();
             renumberPlayers();
         }
@@ -769,6 +797,7 @@
             playerRows.forEach((row, index) => {
                 const select = row.querySelector('.player-role');
                 select.value = roles[index];
+                updateRoleColor(select);
             });
 
             await showAlert(`Roles Randomized!\nMafia: ${numMafia}\nDoctor: ${numDoctor}\nDetective: ${numDetective}\nVillagers: ${numVillagers}`, 'Roles Assigned');
