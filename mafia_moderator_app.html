@@ -1,0 +1,976 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mafia Moderator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #1a1a1a;
+            color: #e0e0e0;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #ff6b6b;
+        }
+
+        h2 {
+            margin: 20px 0 10px;
+            color: #4ecdc4;
+            border-bottom: 2px solid #4ecdc4;
+            padding-bottom: 5px;
+        }
+
+        .section {
+            background: #2a2a2a;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #b0b0b0;
+        }
+
+        input,
+        select,
+        textarea {
+            width: 100%;
+            padding: 10px;
+            background: #1a1a1a;
+            border: 1px solid #444;
+            border-radius: 4px;
+            color: #e0e0e0;
+            font-size: 14px;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 60px;
+        }
+
+        button {
+            padding: 10px 20px;
+            background: #4ecdc4;
+            color: #1a1a1a;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+
+        button:hover {
+            background: #45b8b0;
+        }
+
+        button.danger {
+            background: #ff6b6b;
+        }
+
+        button.danger:hover {
+            background: #ff5252;
+        }
+
+        button.secondary {
+            background: #555;
+        }
+
+        button.secondary:hover {
+            background: #666;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        th,
+        td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #444;
+        }
+
+        th {
+            background: #333;
+            color: #4ecdc4;
+            font-weight: bold;
+        }
+
+        tr:hover {
+            background: #333;
+        }
+
+        .status-alive {
+            color: #51cf66;
+            font-weight: bold;
+        }
+
+        .status-dead {
+            color: #ff6b6b;
+            text-decoration: line-through;
+        }
+
+        .role-mafia {
+            color: #ff6b6b;
+        }
+
+        .role-doctor {
+            color: #51cf66;
+        }
+
+        .role-detective {
+            color: #4ecdc4;
+        }
+
+        .role-villager {
+            color: #ffd93d;
+        }
+
+        .round-indicator {
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+            color: #4ecdc4;
+            margin: 20px 0;
+            padding: 15px;
+            background: #333;
+            border-radius: 8px;
+        }
+
+        .history-item {
+            background: #333;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+            border-left: 4px solid #4ecdc4;
+        }
+
+        .history-night {
+            border-left-color: #6c5ce7;
+        }
+
+        .history-day {
+            border-left-color: #ffd93d;
+        }
+
+        .vote-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+            align-items: center;
+        }
+
+        .vote-row select {
+            flex: 1;
+        }
+
+        .vote-row button {
+            margin: 0;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+
+            .section {
+                padding: 15px;
+            }
+
+            table {
+                font-size: 12px;
+            }
+
+            th,
+            td {
+                padding: 6px;
+            }
+
+            button {
+                padding: 8px 15px;
+                font-size: 13px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>🎭 Mafia Game Moderator</h1>
+
+        <div id="setupSection" class="section">
+            <h2>Game Setup</h2>
+            <div class="form-group">
+                <label>Number of Players:</label>
+                <input type="number" id="numPlayers" min="4" max="50" value="18">
+                <button onclick="generatePlayers()">Generate Player List</button>
+                <button onclick="loadDefaultPlayers()" class="secondary">Load Default Names</button>
+                <button onclick="randomizeRoles()" class="secondary">Randomize Roles</button>
+            </div>
+
+            <div id="playerSetup" class="hidden">
+                <h3 style="color: #ffd93d; margin-top: 20px;">Player List</h3>
+                <div id="playerList"></div>
+                <button onclick="addPlayer()">Add Player</button>
+                <button onclick="startGame()">Start Game</button>
+            </div>
+        </div>
+
+        <div id="gameSection" class="hidden">
+            <div class="round-indicator">
+                <span id="roundDisplay">Night 1</span>
+            </div>
+
+            <div class="section">
+                <button onclick="nextRound()">Next Round</button>
+                <button onclick="showSection('playersTab')" class="secondary">Players</button>
+                <button onclick="showSection('nightTab')" class="secondary">Night Actions</button>
+                <button onclick="showSection('dayTab')" class="secondary">Day Voting</button>
+                <button onclick="showSection('historyTab')" class="secondary">History</button>
+                <button onclick="resetGame()" class="danger">Reset Game</button>
+            </div>
+
+            <div id="playersTab" class="section">
+                <h2>Players</h2>
+                <table id="playersTable">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Name</th>
+                            <th>Role</th>
+                            <th>Status</th>
+                            <th>Death Reason</th>
+                            <th>Notes</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="playersTableBody"></tbody>
+                </table>
+            </div>
+
+            <div id="nightTab" class="section hidden">
+                <h2>Night Actions</h2>
+                <div class="form-group">
+                    <label>Mafia Target:</label>
+                    <select id="mafiaTarget"></select>
+                </div>
+                <div class="form-group">
+                    <label>Doctor Save:</label>
+                    <select id="doctorSave"></select>
+                </div>
+                <div class="form-group" id="detectiveSection">
+                    <label>Detective Investigation:</label>
+                    <select id="detectiveInvestigate"></select>
+                </div>
+
+                <button onclick="processNight()">Process Night</button>
+            </div>
+
+            <div id="dayTab" class="section hidden">
+                <h2>Day Voting</h2>
+                <div id="votingArea">
+                    <div id="votesList"></div>
+                    <button onclick="addVoteForAllPlayers()">Quick Add All Players</button>
+                    <button onclick="addVote()" class="secondary">Add Single Vote</button>
+                    <button onclick="tallyVotes()">Tally Votes</button>
+                </div>
+                <div id="voteResults" class="hidden" style="margin-top: 20px;">
+                    <h3 style="color: #ffd93d;">Vote Results</h3>
+                    <div id="voteTally"></div>
+                    <div class="form-group" style="margin-top: 15px;">
+                        <label>Eliminate Player:</label>
+                        <select id="eliminatedPlayer"></select>
+                    </div>
+                    <button onclick="processDay()">Confirm Elimination</button>
+                </div>
+            </div>
+
+            <div id="historyTab" class="section hidden">
+                <h2>Game History</h2>
+                <div id="historyList"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let gameState = {
+            players: [],
+            currentRound: 1,
+            roundType: 'night',
+            history: [],
+            votes: []
+        };
+
+        const defaultNames = [
+            'Harimati', 'Kirtan', 'Krishn', 'Abhi', 'Hitwanshi',
+            'Harsh', 'Jaimeen', 'Dhruvil', 'Sumankumar', 'Parth',
+            'Kishan', 'Foram', 'Shivam', 'Sumant', 'Navdeep',
+            'Yatri', 'Jinali', 'Sunil'
+        ];
+
+        function loadGame() {
+            const saved = localStorage.getItem('mafiaGame');
+            if (saved) {
+                gameState = JSON.parse(saved);
+                document.getElementById('setupSection').classList.add('hidden');
+                document.getElementById('gameSection').classList.remove('hidden');
+                updateGameDisplay();
+            }
+        }
+
+        function loadDefaultPlayers() {
+            const currentNum = parseInt(document.getElementById('numPlayers').value);
+            const numToUse = Math.max(currentNum, defaultNames.length);
+
+            document.getElementById('numPlayers').value = numToUse;
+            generatePlayers();
+
+            const playerRows = document.querySelectorAll('.player-row');
+            playerRows.forEach((row, index) => {
+                const nameInput = row.querySelector('.player-name');
+                if (nameInput) {
+                    if (index < defaultNames.length) {
+                        nameInput.value = defaultNames[index];
+                    } else {
+                        nameInput.value = `Player ${index + 1}`;
+                    }
+                }
+            });
+        }
+
+        function saveGame() {
+            localStorage.setItem('mafiaGame', JSON.stringify(gameState));
+        }
+
+        function generatePlayers() {
+            const num = parseInt(document.getElementById('numPlayers').value);
+            const list = document.getElementById('playerList');
+            list.innerHTML = '';
+
+            for (let i = 1; i <= num; i++) {
+                const div = document.createElement('div');
+                div.style.display = 'grid';
+                div.style.gridTemplateColumns = '50px 1fr 1fr 80px';
+                div.style.gap = '10px';
+                div.style.marginBottom = '10px';
+                div.className = 'player-row';
+                div.setAttribute('data-player-num', i);
+                div.innerHTML = `
+                    <input type="text" value="${i}" disabled style="width: 50px;">
+                    <input type="text" class="player-name" placeholder="Player ${i}" value="Player ${i}">
+                    <select class="player-role">
+                        <option value="Villager">Villager</option>
+                        <option value="Mafia">Mafia</option>
+                        <option value="Doctor">Doctor</option>
+                        <option value="Detective">Detective</option>
+                    </select>
+                    <button onclick="removePlayerRow(this)" class="danger" style="padding: 5px 10px; margin: 0;">Remove</button>
+                `;
+                list.appendChild(div);
+            }
+
+            document.getElementById('playerSetup').classList.remove('hidden');
+        }
+
+        function removePlayerRow(button) {
+            const row = button.parentElement;
+            row.remove();
+            renumberPlayers();
+        }
+
+        function renumberPlayers() {
+            const rows = document.querySelectorAll('.player-row');
+            rows.forEach((row, index) => {
+                const num = index + 1;
+                row.setAttribute('data-player-num', num);
+                row.querySelector('input[disabled]').value = num;
+            });
+            document.getElementById('numPlayers').value = rows.length;
+        }
+
+        function addPlayer() {
+            const list = document.getElementById('playerList');
+            const currentNum = list.children.length + 1;
+
+            const div = document.createElement('div');
+            div.style.display = 'grid';
+            div.style.gridTemplateColumns = '50px 1fr 1fr 80px';
+            div.style.gap = '10px';
+            div.style.marginBottom = '10px';
+            div.className = 'player-row';
+            div.setAttribute('data-player-num', currentNum);
+            div.innerHTML = `
+                <input type="text" value="${currentNum}" disabled style="width: 50px;">
+                <input type="text" class="player-name" placeholder="Player ${currentNum}" value="Player ${currentNum}">
+                <select class="player-role">
+                    <option value="Villager">Villager</option>
+                    <option value="Mafia">Mafia</option>
+                    <option value="Doctor">Doctor</option>
+                    <option value="Detective">Detective</option>
+                </select>
+                <button onclick="removePlayerRow(this)" class="danger" style="padding: 5px 10px; margin: 0;">Remove</button>
+            `;
+            list.appendChild(div);
+            document.getElementById('numPlayers').value = currentNum;
+        }
+
+        function randomizeRoles() {
+            const playerRows = document.querySelectorAll('.player-row');
+            if (playerRows.length === 0) {
+                alert('Generate players first!');
+                return;
+            }
+
+            const numPlayers = playerRows.length;
+
+            // Basic role distribution rules
+            let numMafia = Math.max(1, Math.floor(numPlayers / 3)); // ~1/3 are Mafia
+            if (numPlayers <= 5) numMafia = 1; // Small game adjustment
+
+            const numDoctor = 1;
+            const numDetective = 1;
+            const numVillagers = numPlayers - numMafia - numDoctor - numDetective;
+
+            let roles = [];
+            for (let i = 0; i < numMafia; i++) roles.push('Mafia');
+            for (let i = 0; i < numDoctor; i++) roles.push('Doctor');
+            for (let i = 0; i < numDetective; i++) roles.push('Detective');
+            for (let i = 0; i < numVillagers; i++) roles.push('Villager');
+
+            // Shuffle roles
+            for (let i = roles.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [roles[i], roles[j]] = [roles[j], roles[i]];
+            }
+
+            // Assign to UI
+            playerRows.forEach((row, index) => {
+                const roleSelect = row.querySelector('.player-role');
+                if (roles[index]) {
+                    roleSelect.value = roles[index];
+                }
+            });
+
+            alert(`Roles Randomized!\nMafia: ${numMafia}\nDoctor: ${numDoctor}\nDetective: ${numDetective}\nVillagers: ${numVillagers}`);
+        }
+
+        function startGame() {
+            if (!confirm('Start the game with these players?')) return;
+
+            const playerRows = document.querySelectorAll('.player-row');
+            gameState.players = [];
+
+            playerRows.forEach((row, index) => {
+                const nameInput = row.querySelector('.player-name');
+                const roleSelect = row.querySelector('.player-role');
+
+                gameState.players.push({
+                    number: index + 1,
+                    name: nameInput.value,
+                    role: roleSelect.value,
+                    alive: true,
+                    deathReason: '',
+                    notes: ''
+                });
+            });
+
+            if (gameState.players.length === 0) {
+                alert('Please add at least one player!');
+                return;
+            }
+
+            gameState.currentRound = 1;
+            gameState.roundType = 'night';
+            gameState.history = [];
+            gameState.votes = [];
+
+            saveGame();
+            document.getElementById('setupSection').classList.add('hidden');
+            document.getElementById('gameSection').classList.remove('hidden');
+            updateGameDisplay();
+            showSection('nightTab'); // Start with Night Actions
+        }
+
+        function updateGameDisplay() {
+            updateRoundDisplay();
+            updatePlayersTable();
+            updateDropdowns();
+            updateHistory();
+        }
+
+        function updateRoundDisplay() {
+            const type = gameState.roundType.charAt(0).toUpperCase() + gameState.roundType.slice(1);
+            document.getElementById('roundDisplay').textContent = `${type} ${gameState.currentRound}`;
+        }
+
+        function updatePlayersTable() {
+            const tbody = document.getElementById('playersTableBody');
+            tbody.innerHTML = '';
+
+            gameState.players.forEach((p, idx) => {
+                const row = tbody.insertRow();
+                row.innerHTML = `
+                    <td>${p.number}</td>
+                    <td>${p.name}</td>
+                    <td class="role-${p.role.toLowerCase()}">${p.role}</td>
+                    <td class="${p.alive ? 'status-alive' : 'status-dead'}">${p.alive ? 'Alive' : 'Dead'}</td>
+                    <td>${p.deathReason}</td>
+                    <td><input type="text" value="${p.notes}" onchange="updateNote(${idx}, this.value)" style="width: 150px;"></td>
+                    <td>
+                        <button onclick="editPlayer(${idx})" style="padding: 5px 10px; margin: 0;">Edit</button>
+                        ${p.alive ? `<button onclick="killPlayer(${idx})" class="danger" style="padding: 5px 10px; margin: 0;">Kill</button>` : ''}
+                    </td>
+                `;
+            });
+        }
+
+        function updateDropdowns() {
+            const alivePlayers = gameState.players.filter(p => p.alive);
+
+            // Mafia Target: Exclude Mafia members
+            const mafiaTargetSelect = document.getElementById('mafiaTarget');
+            mafiaTargetSelect.innerHTML = '<option value="">-</option>';
+            alivePlayers.filter(p => p.role !== 'Mafia').forEach(p => {
+                mafiaTargetSelect.innerHTML += `<option value="${p.number}">${p.name}</option>`;
+            });
+
+            // Doctor Save: All alive players (can self-save usually)
+            const doctorSaveSelect = document.getElementById('doctorSave');
+            doctorSaveSelect.innerHTML = '<option value="">-</option>';
+            alivePlayers.forEach(p => {
+                doctorSaveSelect.innerHTML += `<option value="${p.number}">${p.name}</option>`;
+            });
+
+            // Detective Investigate: Exclude Detectives
+            const detectiveSelect = document.getElementById('detectiveInvestigate');
+            detectiveSelect.innerHTML = '<option value="">-</option>';
+            alivePlayers.filter(p => p.role !== 'Detective').forEach(p => {
+                detectiveSelect.innerHTML += `<option value="${p.number}">${p.name}</option>`;
+            });
+
+            // Eliminate List (Day): All alive players
+            const eliminateSelect = document.getElementById('eliminatedPlayer');
+            eliminateSelect.innerHTML = '<option value="">-</option>';
+            alivePlayers.forEach(p => {
+                eliminateSelect.innerHTML += `<option value="${p.number}">${p.name}</option>`;
+            });
+
+            // Hide/Disable Detective Section if no Detective is alive
+            const detectiveAlive = alivePlayers.some(p => p.role === 'Detective');
+            const detectiveSection = document.getElementById('detectiveSection');
+            if (detectiveAlive) {
+                detectiveSection.style.display = 'block';
+            } else {
+                detectiveSection.style.display = 'none';
+            }
+        }
+
+        function updateNote(idx, value) {
+            gameState.players[idx].notes = value;
+            saveGame();
+        }
+
+        function editPlayer(idx) {
+            const p = gameState.players[idx];
+            const newName = prompt('Player Name:', p.name);
+            if (newName) p.name = newName;
+
+            const newRole = prompt('Role (Mafia/Doctor/Detective/Villager):', p.role);
+            if (newRole) p.role = newRole;
+
+            saveGame();
+            updateGameDisplay();
+        }
+
+        function killPlayer(idx) {
+            const p = gameState.players[idx];
+            if (!confirm(`Kill ${p.name}?`)) return;
+
+            const reason = prompt('Death reason:', 'Killed by Mafia');
+            p.alive = false;
+            p.deathReason = reason;
+
+            p.deathReason = reason;
+
+            saveGame();
+            updateGameDisplay();
+            checkWinCondition();
+        }
+
+        function nextRound() {
+            if (!confirm('Move to next round?')) return;
+
+            if (gameState.roundType === 'night') {
+                gameState.roundType = 'day';
+            } else {
+                gameState.roundType = 'night';
+                gameState.currentRound++;
+            }
+
+            gameState.votes = [];
+            saveGame();
+            updateGameDisplay();
+
+            // Auto-switch tab based on phase
+            if (gameState.roundType === 'night') {
+                showSection('nightTab');
+            } else {
+                showSection('dayTab');
+            }
+        }
+
+        function processNight() {
+            if (!confirm('Process night actions?')) return;
+
+            const mafiaTarget = parseInt(document.getElementById('mafiaTarget').value);
+            const doctorSave = parseInt(document.getElementById('doctorSave').value);
+            const detectiveInv = parseInt(document.getElementById('detectiveInvestigate').value);
+
+            // Automate Investigation Result
+            let invResult = '-';
+            if (detectiveInv) {
+                const targetPlayer = gameState.players.find(p => p.number === detectiveInv);
+                if (targetPlayer) {
+                    invResult = (targetPlayer.role === 'Mafia') ? 'Mafia' : 'Not Mafia';
+                }
+            }
+
+            let outcome = '';
+            let dead = null;
+
+            if (mafiaTarget && mafiaTarget === doctorSave) {
+                outcome = `Mafia targeted ${getPlayerName(mafiaTarget)}, but Doctor saved them!`;
+            } else if (mafiaTarget) {
+                const player = gameState.players.find(p => p.number === mafiaTarget);
+                player.alive = false;
+                player.deathReason = 'Killed by Mafia';
+                dead = mafiaTarget;
+                outcome = `${getPlayerName(mafiaTarget)} was killed by Mafia.`;
+            } else {
+                outcome = 'No one died tonight.';
+            }
+
+            if (detectiveInv) {
+                outcome += `\n\n🕵️‍♂️ Detective Investigation:\n${getPlayerName(detectiveInv)} is ${invResult}.`;
+            } else if (gameState.players.some(p => p.role === 'Detective' && p.alive)) {
+                // Warning if detective was alive but didn't act? Optional, but skipping is valid strategy.
+            }
+
+            gameState.history.push({
+                round: gameState.currentRound,
+                type: 'night',
+                mafiaTarget: mafiaTarget,
+                doctorSave: doctorSave,
+                detectiveInvestigate: detectiveInv,
+                investigationResult: invResult,
+                outcome: outcome,
+                dead: dead
+            });
+
+            saveGame();
+            updateGameDisplay();
+            alert(outcome);
+            checkWinCondition();
+            nextRound(); // Auto-trigger next round with confirmation
+        }
+
+        function addVote() {
+            gameState.votes.push({ voter: '', target: '' });
+            renderVotes();
+        }
+
+        function addVoteForAllPlayers() {
+            const alivePlayers = gameState.players.filter(p => p.alive);
+            const usedVoters = gameState.votes.map(v => v.voter);
+            const availableVoters = alivePlayers.filter(p => !usedVoters.includes(p.number));
+
+            availableVoters.forEach(player => {
+                gameState.votes.push({ voter: player.number, target: '' });
+            });
+
+            saveGame();
+            renderVotes();
+        }
+
+        function renderVotes() {
+            const list = document.getElementById('votesList');
+            list.innerHTML = '';
+
+            const alivePlayers = gameState.players.filter(p => p.alive);
+            const usedVoters = gameState.votes.map(v => v.voter);
+
+            gameState.votes.forEach((v, idx) => {
+                const availableVoters = alivePlayers.filter(p =>
+                    p.number === v.voter || !usedVoters.includes(p.number)
+                );
+
+                const div = document.createElement('div');
+                div.className = 'vote-row';
+                div.innerHTML = `
+                    <select onchange="updateVote(${idx}, 'voter', this.value)">
+                        <option value="">Voter</option>
+                        ${availableVoters.map(p =>
+                    `<option value="${p.number}" ${v.voter === p.number ? 'selected' : ''}>${p.name}</option>`
+                ).join('')}
+                    </select>
+                    <span style="color: #4ecdc4;">→</span>
+                    <select onchange="updateVote(${idx}, 'target', this.value)">
+                        <option value="">Target</option>
+                        ${alivePlayers.map(p =>
+                    `<option value="${p.number}" ${v.target === p.number ? 'selected' : ''}>${p.name}</option>`
+                ).join('')}
+                    </select>
+                    <button onclick="removeVote(${idx})" class="danger">Remove</button>
+                `;
+                list.appendChild(div);
+            });
+        }
+
+        function updateVote(idx, field, value) {
+            gameState.votes[idx][field] = parseInt(value);
+            saveGame();
+        }
+
+        function removeVote(idx) {
+            gameState.votes.splice(idx, 1);
+            saveGame();
+            renderVotes();
+        }
+
+        function tallyVotes() {
+            const tally = {};
+            const voteDetails = {};
+
+            gameState.votes.forEach(v => {
+                if (v.target && v.voter) {
+                    tally[v.target] = (tally[v.target] || 0) + 1;
+                    if (!voteDetails[v.target]) {
+                        voteDetails[v.target] = [];
+                    }
+                    voteDetails[v.target].push(getPlayerName(v.voter));
+                }
+            });
+
+            const results = Object.entries(tally)
+                .map(([num, count]) => ({ num: parseInt(num), count }))
+                .sort((a, b) => b.count - a.count);
+
+            const div = document.getElementById('voteTally');
+
+            if (results.length === 0) {
+                div.innerHTML = '<p style="color: #ff6b6b; padding: 20px; text-align: center;">No votes recorded yet!</p>';
+                document.getElementById('voteResults').classList.remove('hidden');
+                return;
+            }
+
+            const maxVotes = results[0].count;
+            const topVoted = results.filter(r => r.count === maxVotes);
+
+            div.innerHTML = `
+                <div style="background: #1a1a1a; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+                    <h3 style="color: #4ecdc4; margin-bottom: 15px;">📊 Vote Tally</h3>
+                    <table style="width: 100%;">
+                        <thead>
+                            <tr>
+                                <th style="text-align: left; padding: 10px; background: #2a2a2a;">Player</th>
+                                <th style="text-align: center; padding: 10px; background: #2a2a2a;">Votes</th>
+                                <th style="text-align: left; padding: 10px; background: #2a2a2a;">Voted By</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${results.map(r => `
+                                <tr style="background: ${r.count === maxVotes ? '#2a4a2a' : 'transparent'};">
+                                    <td style="padding: 10px; font-weight: bold; color: ${r.count === maxVotes ? '#51cf66' : '#e0e0e0'};">
+                                        ${getPlayerName(r.num)}
+                                    </td>
+                                    <td style="padding: 10px; text-align: center; font-size: 24px; font-weight: bold; color: ${r.count === maxVotes ? '#51cf66' : '#ffd93d'};">
+                                        ${r.count}
+                                    </td>
+                                    <td style="padding: 10px; font-size: 13px; color: #b0b0b0;">
+                                        ${voteDetails[r.num].join(', ')}
+                                    </td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+
+            // Handle elimination logic
+            const eliminateSelect = document.getElementById('eliminatedPlayer');
+            eliminateSelect.innerHTML = '<option value="">-</option>';
+
+            if (topVoted.length === 1) {
+                // Clear winner
+                const winner = topVoted[0];
+                const player = gameState.players.find(p => p.number === winner.num);
+                div.innerHTML += `
+                    <div style="background: #4a2a2a; padding: 15px; border-radius: 8px; border-left: 4px solid #ff6b6b;">
+                        <strong style="color: #ff6b6b; font-size: 18px;">🎯 ${player.name} has the most votes (${maxVotes}) and will be eliminated!</strong>
+                    </div>
+                `;
+                eliminateSelect.innerHTML += `<option value="${winner.num}" selected>${getPlayerName(winner.num)} (${maxVotes} votes)</option>`;
+            } else {
+                // Tie situation
+                div.innerHTML += `
+                    <div style="background: #4a4a2a; padding: 15px; border-radius: 8px; border-left: 4px solid #ffd93d;">
+                        <strong style="color: #ffd93d; font-size: 18px;">⚠️ TIE! ${topVoted.length} players have ${maxVotes} votes each.</strong><br>
+                        <span style="color: #b0b0b0;">No one will be eliminated automatically. Select a player below to eliminate manually, or skip elimination.</span>
+                    </div>
+                `;
+                topVoted.forEach(r => {
+                    eliminateSelect.innerHTML += `<option value="${r.num}">${getPlayerName(r.num)} (${r.count} votes - TIED)</option>`;
+                });
+            }
+
+            document.getElementById('voteResults').classList.remove('hidden');
+        }
+
+        function processDay() {
+            const eliminated = parseInt(document.getElementById('eliminatedPlayer').value);
+            if (!eliminated) {
+                if (confirm('No player selected. Skip elimination for this day?')) {
+                    gameState.history.push({
+                        round: gameState.currentRound,
+                        type: 'day',
+                        votes: [...gameState.votes],
+                        eliminated: null,
+                        eliminatedRole: null,
+                        skipped: true
+                    });
+
+                    gameState.votes = [];
+                    saveGame();
+                    updateGameDisplay();
+                    document.getElementById('voteResults').classList.add('hidden');
+                    alert('No one was eliminated today.');
+                    nextRound(); // Auto-trigger next round
+                }
+                return;
+            }
+
+            if (!confirm(`Eliminate ${getPlayerName(eliminated)}?`)) return;
+
+            const player = gameState.players.find(p => p.number === eliminated);
+            player.alive = false;
+            player.deathReason = 'Eliminated by Vote';
+
+            gameState.history.push({
+                round: gameState.currentRound,
+                type: 'day',
+                votes: [...gameState.votes],
+                eliminated: eliminated,
+                eliminatedRole: player.role
+            });
+
+            gameState.votes = [];
+            saveGame();
+            updateGameDisplay();
+            document.getElementById('voteResults').classList.add('hidden');
+            alert(`${player.name} (${player.role}) was eliminated.`);
+            checkWinCondition();
+            nextRound(); // Auto-trigger next round
+        }
+
+        function updateHistory() {
+            const list = document.getElementById('historyList');
+            list.innerHTML = '';
+
+            gameState.history.slice().reverse().forEach(h => {
+                const div = document.createElement('div');
+                div.className = `history-item history-${h.type}`;
+
+                if (h.type === 'night') {
+                    div.innerHTML = `
+                        <strong>Night ${h.round}</strong><br>
+                        Mafia Target: ${getPlayerName(h.mafiaTarget)}<br>
+                        Doctor Save: ${getPlayerName(h.doctorSave)}<br>
+                        Detective: ${getPlayerName(h.detectiveInvestigate)} → ${h.investigationResult || '-'}<br>
+                        <strong>Outcome:</strong> ${h.outcome}
+                    `;
+                } else {
+                    div.innerHTML = `
+                        <strong>Day ${h.round}</strong><br>
+                        Votes Cast: ${h.votes.length}<br>
+                        ${h.skipped ? '<span style="color: #ffd93d;">No elimination (Tie or Skip)</span>' :
+                            `Eliminated: ${getPlayerName(h.eliminated)} (${h.eliminatedRole})`}
+                    `;
+                }
+
+                list.appendChild(div);
+            });
+        }
+
+        function getPlayerName(num) {
+            if (!num) return '-';
+            const p = gameState.players.find(p => p.number === num);
+            return p ? p.name : '-';
+        }
+
+        function showSection(tab) {
+            ['playersTab', 'nightTab', 'dayTab', 'historyTab'].forEach(id => {
+                document.getElementById(id).classList.add('hidden');
+            });
+            document.getElementById(tab).classList.remove('hidden');
+
+            if (tab === 'dayTab') {
+                renderVotes();
+            }
+        }
+
+        function resetGame() {
+            if (!confirm('Reset entire game? This cannot be undone!')) return;
+            if (!confirm('Are you absolutely sure?')) return;
+
+            localStorage.removeItem('mafiaGame');
+            location.reload();
+        }
+
+        function checkWinCondition() {
+            const alivePlayers = gameState.players.filter(p => p.alive);
+            const mafiaCount = alivePlayers.filter(p => p.role === 'Mafia').length;
+            const villagerCount = alivePlayers.length - mafiaCount;
+
+            if (mafiaCount === 0) {
+                alert('🏆 VILLAGERS WIN!\n\nAll Mafia have been eliminated.');
+            } else if (mafiaCount >= villagerCount) {
+                alert('🕵️‍♂️ MAFIA WINS!\n\nMafia now equal or outnumber the Villagers.');
+            }
+        }
+
+        loadGame();
+    </script>
+</body>
+
+</html>
